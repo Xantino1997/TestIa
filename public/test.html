@@ -211,7 +211,7 @@ function endTest() {
 
 
       function showTopScores() {
-        fetch('https://test-ia-3qto.vercel.app/getTopScores')
+        fetch('/getTopScores')
           .then(response => response.json())
           .then(data => {
             const scoreBoard = document.getElementById('scoreBoard');
