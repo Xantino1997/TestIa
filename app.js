@@ -16,6 +16,11 @@ app.use(cors({
   origin: ['https://test-ia-gamma.vercel.app']
 }));
 
+// Ruta simple para verificar si el servidor está en marcha
+app.get('/status', (req, res) => {
+  res.send('Servidor en marcha');
+});
+
 // Ruta para guardar los datos en leads.json
 app.post('/saveLead', (req, res) => {
   const { name, email, phone } = req.body;
