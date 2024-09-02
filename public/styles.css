@@ -1,0 +1,141 @@
+/* Reset de estilos para asegurarse de consistencia */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .central-image {
+    max-width: 30%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .form-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  button {
+    padding: 10px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #ff6b6b;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #ff4d4d;
+  }
+  
+  .score-section {
+    margin-top: 30px;
+  }
+  
+  #scores {
+    list-style: none;
+    padding: 0;
+  }
+  
+  #scores li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      width: 95%;
+    }
+  
+    .hero {
+      flex-direction: column;
+    }
+  }
+  
+
+
+  .top-scores {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .top-score-item {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  .medal {
+    width: 30px;
+    vertical-align: middle;
+  }
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .form-container {
+    width: 50%;
+  }
+  .image-container {
+    width: 40%;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .image-empatia {
+    height:auto;
+    width: 60%; /* Ajuste el tamaño de la imagen para que no ocupe todo el contenedor */
+    z-index: 1; /* Asegura que la imagen esté en el frente */
+    mix-blend-mode: multiply; /* Mezcla la imagen con el degradado */
+  }
+  

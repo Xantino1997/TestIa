@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulario del Test</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <h1>Formulario del Test</h1>
+        <form id="dataForm">
+          <label for="name">Nombre:</label>
+          <input type="text" id="name" name="name" required />
+
+          <label for="email">Correo electrónico:</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="phone">Número de teléfono:</label>
+          <input type="tel" id="phone" name="phone" required />
+
+          <button type="submit" id="startTest">Enviar</button>
+        </form>
+      </div>
+      <div class="image-container">
+        <img
+          class="image-empatia"
+          src="/assets/IntroduccionIa.jpeg"
+          alt="Empathia"
+        />
+      </div>
+      <div class="top-scores">
+        <h2>Top Puntajes</h2>
+        <div id="topScoresList"></div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const dataForm = document.getElementById("dataForm");
+        const topScoresList = document.getElementById("topScoresList");
+
+        // Manejador de evento para el formulario
+        dataForm.addEventListener("submit", (event) => {
+          event.preventDefault(); // Evita el envío por defecto del formulario
+
+          const name = document.getElementById("name").value;
+          const email = document.getElementById("email").value;
+          const phone = document.getElementById("phone").value;
+          localStorage.setItem("userName", name);
+          if (!name || !email || !phone) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Todos los campos son obligatorios",
+            });
+            return;
+          }
+
+          // Enviar datos al backend
+          fetch("/saveLead", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, email, phone }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                Swal.fire({
+                  icon: "success",
+                  title: "Exitos!",
+                  text: "Vamos para tu test.",
+                  willClose: () => {
+                    // Redirige a test.html después de que se cierre la alerta
+                    window.location.href = "test.html";
+                  },
+                });
+              } else {
+                throw new Error("Error guardando datos");
+              }
+            })
+            .catch((error) => {
+              console.error("Error guardando datos:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Hubo un problema al guardar tus datos.",
+              });
+            });
+        });
+
+        // Obtener y mostrar los mejores puntajes
+        fetch("/getTopScores")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.length === 0) return; // Si no hay datos, no hacemos nada
+
+            // Ordenar los datos por puntaje en orden descendente
+            const sortedData = data.sort((a, b) => b.points - a.points);
+
+            // Seleccionar los tres primeros elementos
+            const topThree = sortedData.slice(0, 3);
+            const cups = ["🏆", "🥉", "🥈"]; // íconos para cada puesto
+
+            // Limpiar el contenedor de los puntajes antes de agregar nuevos
+            topScoresList.innerHTML = "";
+
+            // Mostrar los tres mejores puntajes
+            topThree.forEach((user, index) => {
+              const scoreItem = document.createElement("div");
+              scoreItem.className = "top-score-item";
+
+              const icon = cups[index] || "";
+
+              scoreItem.innerHTML = `${icon} ${user.name}: ${user.points}`;
+              topScoresList.appendChild(scoreItem);
+            });
+          })
+          .catch((error) => {
+            console.error("Error obteniendo los mejores puntajes:", error);
+          });
+      });
+    </script>
+  </body>
+</html>
