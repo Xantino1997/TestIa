@@ -18,7 +18,7 @@
         "headers": [
           {
             "key": "Access-Control-Allow-Origin",
-            "value": "*,https://test-ia-gamma.vercel.app)"
+            "value": "https://test-ia-gamma.vercel.app)"
           },
           {
             "key": "Access-Control-Allow-Methods",
