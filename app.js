@@ -13,7 +13,7 @@ app.use(express.static('public')); // Sirve archivos estáticos de la carpeta 'p
 
 // Configurar CORS para permitir solicitudes desde el origen específico
 app.use(cors({
-  origin: ['*']
+  origin: ['https://test-ia-sadp.vercel.app']
 }));
 
 // Ruta simple para verificar si el servidor está en marcha
