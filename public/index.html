@@ -60,7 +60,7 @@
           }
 
           // Enviar datos al backend
-          fetch("/saveLead", {
+          fetch("https://test-ia-3qto.vercel.app/saveLead", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -94,7 +94,7 @@
         });
 
         // Obtener y mostrar los mejores puntajes
-        fetch("/getTopScores")
+        fetch("https://test-ia-3qto.vercel.app/getTopScores")
           .then((response) => response.json())
           .then((data) => {
             if (data.length === 0) return; // Si no hay datos, no hacemos nada
