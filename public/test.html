@@ -195,7 +195,7 @@ function endTest() {
     const userData = { name: userName, points: score };
 
     // Enviar los datos al backend
-    fetch('/saveUserData', {
+    fetch('https://test-ia-sadp.vercel.app/saveUserData', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
