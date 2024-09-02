@@ -27,7 +27,7 @@
         <div id="questionContainer">
           <!-- Pregunta y opciones se añadirán aquí dinámicamente -->
         </div>
-        <div id="timer">Tiempo restante: <span id="timeLeft">30</span> segundos</div>
+        <div  id="timer">Tiempo restante: <span id="timeLeft">30</span> segundos</div>
         <button id="nextQuestion" style="display: none;">Siguiente Pregunta</button>
         <button id="skipQuestion" style="display: none;">Saltar Pregunta</button>
       </section>
@@ -211,7 +211,7 @@ function endTest() {
 
 
       function showTopScores() {
-        fetch('https://test-ia-sadp.vercel.app/getTopScores')
+        fetch('/getTopScores')
           .then(response => response.json())
           .then(data => {
             const scoreBoard = document.getElementById('scoreBoard');
