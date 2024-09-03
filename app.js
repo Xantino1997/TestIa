@@ -10,7 +10,7 @@ const { MongoClient } = require('mongodb');
 const uri = 'mongodb+srv://devprueba2022:newdev2024@cluster0.9x8yltr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Reemplaza con tu cadena de conexión de MongoDB
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const Participante = require('./schemaParticipantes');
+const Participante = require('./SchemasParticipantes');
 
 
 // Configurar middleware
@@ -48,33 +48,35 @@ app.post('/saveLead', async (req, res) => {
   }
 });
 
-// Ruta para guardar los datos de usuario en la base de datos
+ // Ruta para guardar los datos de usuario en la base de datos
 app.post('/saveUserData', async (req, res) => {
     const userData = req.body;
-
+  
     try {
-        // Crear un nuevo participante con los datos del usuario
-        const participante = new Participante({
-            name: userData.name,
-            email: userData.email,
-            phone: userData.phone,
-            points: userData.points
-        });
-
-        // Guardar el participante en la base de datos
-        await participante.save();
-
-        // Obtener los mejores puntajes
-        const topScores = await Participante.find().sort({ points: -1 }).limit(3);
-
-        res.json({ message: 'Datos guardados', topScores });
+      // Crear un nuevo participante con los datos del usuario
+      const participante = new Participante({
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        points: userData.points
+      });
+  
+      // Guardar el participante en la base de datos
+      await participante.save();
+  
+      // Obtener los mejores puntajes
+      const topScores = await Participante.find().sort({ points: -1 }).limit(3);
+  
+      res.json({ message: 'Datos guardados', topScores });
     } catch (error) {
-        console.error('Error guardando datos de usuario:', error);
-        res.status(500).json({ success: false, message: 'Error guardando datos de usuario' });
+      console.error('Error guardando datos de usuario:', error);
+      res.status(500).json({ success: false, message: 'Error guardando datos de usuario' });
     }
-});
+  });
 
-app.post('/saveTopScores', async (req, res) => {
+
+
+  app.post('/saveTopScores', async (req, res) => {
     const { scores } = req.body;
 
     try {
@@ -83,10 +85,8 @@ app.post('/saveTopScores', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Formato de datos incorrecto' });
         }
 
-        // Limpiar la colección antes de guardar nuevos datos
-        await Participante.deleteMany(); 
-
-        // Insertar los nuevos puntajes
+        // Guardar cada puntaje en la base de datos
+        await Participante.deleteMany(); // Opcional: Limpiar la colección antes de guardar nuevos datos
         await Participante.insertMany(scores);
 
         res.json({ success: true, message: 'Puntajes guardados correctamente' });
@@ -95,16 +95,16 @@ app.post('/saveTopScores', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error guardando los puntajes' });
     }
 });
-
-// app.get('/getTopScores', async (req, res) => {
-//     try {
-//         const participantes = await Participante.find().sort({ points: -1 }).limit(3);
-//         res.json(participantes);
-//     } catch (error) {
-//         console.error('Error obteniendo los mejores puntajes:', error);
-//         res.status(500).json({ success: false, message: 'Error obteniendo los mejores puntajes' });
-//     }
-// });
-
+  
+  app.get('/getTopScores', async (req, res) => {
+    try {
+      const participantes = await Participante.find().sort({ points: -1 }).limit(3);
+      res.json(participantes);
+    } catch (error) {
+      console.error('Error obteniendo los mejores puntajes:', error);
+      res.status(500).json({ success: false, message: 'Error obteniendo los mejores puntajes' });
+    }
+  });
+  
 
 module.exports = app;
