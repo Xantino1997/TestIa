@@ -48,27 +48,35 @@ app.post('/saveLead', async (req, res) => {
   }
 });
 
- // Ruta para guardar los datos de usuario en la base de datos
+// Ruta para guardar los datos de usuario en la base de datos
 app.post('/saveUserData', async (req, res) => {
     const { name, points } = req.body;
 
     try {
-        await client.connect();
-        const database = client.db('testPuntos'); // Reemplaza con tu nombre de base de datos
-        const collection = database.collection('Points'); // Reemplaza con tu colección
-    
-        await collection.insertOne({ name, points });
-    
-        res.json({ success: true });
+        // Conectar a MongoDB
+        await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-      // Guardar el participante en la base de datos
-      await participante.save();
-  
+        // Crear un nuevo participante con los datos del usuario
+        const participante = new Participante({
+            name: name,
+            points: points
+        });
+
+        // Guardar el participante en la base de datos
+        await participante.save();
+
+        // Obtener los mejores puntajes
+        const topScores = await Participante.find().sort({ points: -1 }).limit(3);
+
+        res.json({ message: 'Datos guardados', topScores });
     } catch (error) {
-      console.error('Error guardando datos de usuario:', error);
-      res.status(500).json({ success: false, message: 'Error guardando datos de usuario' });
+        console.error('Error guardando datos de usuario:', error);
+        res.status(500).json({ success: false, message: 'Error guardando datos de usuario' });
+    } finally {
+        await mongoose.disconnect();
     }
-  });
+});
+
 
 
 
