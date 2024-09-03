@@ -50,7 +50,7 @@ app.post('/saveLead', async (req, res) => {
 
 // Ruta para guardar los datos de usuario en la base de datos
 app.post('/saveUserData', async (req, res) => {
-    const { name, points } = req.body;
+    const userData = req.body;
 
     try {
         // Conectar a MongoDB
@@ -58,8 +58,8 @@ app.post('/saveUserData', async (req, res) => {
 
         // Crear un nuevo participante con los datos del usuario
         const participante = new Participante({
-            name: name,
-            points: points
+            name: userData.name,
+            points: userData.points
         });
 
         // Guardar el participante en la base de datos
