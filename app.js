@@ -6,6 +6,11 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
+const { MongoClient } = require('mongodb');
+const uri = 'mongodb+srv://devprueba2022:newdev2024@cluster0.9x8yltr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Reemplaza con tu cadena de conexión de MongoDB
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+
 
 // Configurar middleware
 app.use(express.json());
@@ -21,32 +26,27 @@ app.get('/status', (req, res) => {
   res.send('Servidor en marcha');
 });
 
-app.post('/saveLead', (req, res) => {
-    try {
-      const { name, email, phone } = req.body;
-  
-      if (!name || !email || !phone) {
-        return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
-      }
-  
-      const filePath = path.join(__dirname, 'leads.json');
-      let leads = [];
-  
-      if (fs.existsSync(filePath)) {
-        const data = fs.readFileSync(filePath);
-        leads = JSON.parse(data);
-      }
-  
-      leads.push({ name, email, phone });
-  
-      fs.writeFileSync(filePath, JSON.stringify(leads, null, 2));
-  
-      res.json({ success: true });
-    } catch (error) {
-      console.error('Error guardando datos:', error);
-      res.status(500).json({ success: false, message: 'Hubo un problema al guardar los datos' });
-    }
-  });
+
+
+app.post('/saveLead', async (req, res) => {
+  const { name, email, phone } = req.body;
+
+  try {
+    await client.connect();
+    const database = client.db('testdb'); // Reemplaza con tu nombre de base de datos
+    const collection = database.collection('leads'); // Reemplaza con tu colección
+
+    await collection.insertOne({ name, email, phone });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error guardando datos:', error);
+    res.status(500).json({ success: false, message: 'Hubo un problema al guardar los datos' });
+  } finally {
+    await client.close();
+  }
+});
+
   
 // Ruta para obtener los mejores puntajes
 app.get('/getTopScores', (req, res) => {
