@@ -73,6 +73,28 @@ app.post('/saveUserData', async (req, res) => {
       res.status(500).json({ success: false, message: 'Error guardando datos de usuario' });
     }
   });
+
+
+
+  app.post('/saveTopScores', async (req, res) => {
+    const { scores } = req.body;
+
+    try {
+        // Asegúrate de que 'scores' es un array de objetos con los campos correctos
+        if (!Array.isArray(scores)) {
+            return res.status(400).json({ success: false, message: 'Formato de datos incorrecto' });
+        }
+
+        // Guardar cada puntaje en la base de datos
+        await Participante.deleteMany(); // Opcional: Limpiar la colección antes de guardar nuevos datos
+        await Participante.insertMany(scores);
+
+        res.json({ success: true, message: 'Puntajes guardados correctamente' });
+    } catch (error) {
+        console.error('Error guardando los puntajes:', error);
+        res.status(500).json({ success: false, message: 'Error guardando los puntajes' });
+    }
+});
   
   app.get('/getTopScores', async (req, res) => {
     try {

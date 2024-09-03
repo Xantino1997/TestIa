@@ -210,20 +210,43 @@ function endTest() {
 }
 
 
-      function showTopScores() {
-        fetch('/getTopScores')
-          .then(response => response.json())
-          .then(data => {
+function showTopScores() {
+    fetch('/getTopScores')
+        .then(response => response.json())
+        .then(data => {
             const scoreBoard = document.getElementById('scoreBoard');
             scoreBoard.innerHTML = '';
             data.sort((a, b) => b.points - a.points);
             data.slice(0, 5).forEach(participante => {
-              const li = document.createElement('li');
-              li.textContent = `${participante.name}: ${participante.points} puntos`;
-              scoreBoard.appendChild(li);
+                const li = document.createElement('li');
+                li.textContent = `${participante.name}: ${participante.points} puntos`;
+                scoreBoard.appendChild(li);
             });
-          });
-      }
+            // Enviar datos al backend para guardarlos en la base de datos
+            sendTopScoresToBackend(data);
+        });
+}
+
+function sendTopScoresToBackend(scores) {
+    fetch('/saveTopScores', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scores }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Puntajes guardados correctamente');
+        } else {
+            console.error('Error guardando los puntajes');
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud POST:', error);
+    });
+}
 
       function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
