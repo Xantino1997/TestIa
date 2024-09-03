@@ -643,9 +643,12 @@
 
           // Enviar los datos al backend
           fetch("https://test-ia-sadp.vercel.app/saveUserData", {
+
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name, points }),
           })
             .then((response) => response.json())
             .then((data) => {
