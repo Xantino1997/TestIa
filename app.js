@@ -56,8 +56,6 @@ app.post('/saveUserData', async (req, res) => {
       // Crear un nuevo participante con los datos del usuario
       const participante = new Participante({
         name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
         points: userData.points
       });
   
