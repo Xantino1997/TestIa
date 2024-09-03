@@ -1,278 +1,705 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preguntas IA</title>
-  <link rel="stylesheet" href="test.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1 id="userNameHeader"></h1>
-    </header>
-    
-    <main>
-      <section class="start-section">
-        <h1>instrucciones</h1>
-        <p>Tendras <strong>30 segundos por pregunta</strong> </p>
-        <p>Cada pregunta vale un punto si es correcta, y ninguno por incorrecta o si la deseas saltear</p>
-        <p>Al final tendras un puntaje final, Exitos!!</p>
-        <hr />
-        <button id="beginTestButton">Iniciar Test</button>
-      </section>
-      
-      <section class="questions-section" style="display: none;">
-        <div id="questionContainer">
-          <!-- Pregunta y opciones se añadirán aquí dinámicamente -->
-        </div>
-        <div  id="timer">Tiempo restante: <span id="timeLeft">30</span> segundos</div>
-        <button id="nextQuestion" style="display: none;">Siguiente Pregunta</button>
-        <button id="skipQuestion" style="display: none;">Saltar Pregunta</button>
-      </section>
-      
-      <section class="result-section" style="display: none;">
-        <h2>Resultados</h2>
-        <p id="userScore"></p>
-        <div id="topScores">
-          <!-- <h3>Mejores Puntajes</h3> -->
-          <ul id="scoreBoard"></ul>
-        </div>
-        <button id="restartButton">Inicio</button>
-      </section>
-    </main>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preguntas IA</title>
+    <link rel="stylesheet" href="test.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1 id="userNameHeader"></h1>
+      </header>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const userName = localStorage.getItem('userName') || 'Artifixio';
-      document.getElementById('userNameHeader').textContent = `${userName}!`;
+      <main>
+        <section class="start-section">
+          <h1>instrucciones</h1>
+          <p>Tendras <strong>30 segundos por pregunta</strong></p>
+          <p>
+            Cada pregunta vale un punto si es correcta, y ninguno por incorrecta
+            o si la deseas saltear
+          </p>
+          <p>Al final tendras un puntaje final, Exitos!!</p>
+          <hr />
+          <button id="beginTestButton">Iniciar Test</button>
+        </section>
 
-      const allQuestions = [
-  { question: "¿Qué es la inteligencia artificial?", correct: "Simulación de inteligencia en máquinas", incorrect: ["Un tipo de programación avanzada", "Un software de procesamiento de texto", "Una técnica de redes sociales"] },
-  { question: "¿Quién es conocido como el padre de la inteligencia artificial?", correct: "Alan Turing", incorrect: ["Albert Einstein", "Isaac Newton", "Charles Babbage"] },
-  { question: "¿Cuál es el lenguaje de programación más usado en inteligencia artificial?", correct: "Python", incorrect: ["Java", "C#", "JavaScript"] },
-  { question: "¿Qué es un algoritmo?", correct: "Un conjunto de instrucciones para realizar una tarea", incorrect: ["Un tipo de hardware", "Un programa de software", "Un lenguaje de programación"] },
-  { question: "¿Qué significa IA?", correct: "Inteligencia Artificial", incorrect: ["Interacción Automática", "Instrucción Algorítmica", "Implementación Avanzada"] },
-  { question: "¿Qué es un chatbot?", correct: "Programa que simula una conversación con un ser humano", incorrect: ["Un tipo de robot físico", "Una aplicación de mensajería", "Un dispositivo de red"] },
-  { question: "¿Qué es el aprendizaje automático?", correct: "Método de IA que permite a las máquinas aprender de datos", incorrect: ["Un software de gráficos", "Una técnica de almacenamiento", "Un algoritmo de búsqueda"] },
-  { question: "¿Qué hace un modelo de IA?", correct: "Realiza predicciones o toma decisiones basadas en datos", incorrect: ["Desarrolla software", "Diseña hardware", "Administra redes"] },
-  { question: "¿Qué es el aprendizaje supervisado?", correct: "Entrenamiento de modelos con datos etiquetados", incorrect: ["Aprendizaje sin datos", "Un tipo de juego en línea", "Entrenamiento en hardware"] },
-  { question: "¿Qué es el aprendizaje no supervisado?", correct: "Método de aprendizaje sin datos etiquetados", incorrect: ["Entrenamiento con etiquetas", "Uso de datos en línea", "Un método de clasificación"] },
-  { question: "¿Qué es una red neuronal?", correct: "Modelo computacional inspirado en el cerebro humano", incorrect: ["Un tipo de base de datos", "Un programa de diseño gráfico", "Un tipo de hardware"] },
-  { question: "¿Qué es el 'overfitting' en IA?", correct: "Cuando un modelo se ajusta demasiado a los datos de entrenamiento", incorrect: ["Cuando un modelo tiene baja precisión", "Cuando un modelo es demasiado simple", "Cuando un modelo no puede aprender"] },
-  { question: "¿Qué es una técnica de clasificación en IA?", correct: "Método para asignar etiquetas a datos", incorrect: ["Un algoritmo para optimizar datos", "Un tipo de red neuronal", "Un método de reducción de datos"] },
-  { question: "¿Qué es una 'técnica de regresión'?", correct: "Método para predecir valores continuos", incorrect: ["Método para clasificar datos", "Un tipo de algoritmo de búsqueda", "Una técnica de agrupación"] },
-  { question: "¿Qué es un 'dataset'?", correct: "Conjunto de datos utilizados para entrenar y probar modelos", incorrect: ["Un tipo de algoritmo", "Un software de análisis", "Una red de datos"] },
-  { question: "¿Qué es la 'normalización de datos'?", correct: "Proceso de ajustar los datos para que sean consistentes", incorrect: ["Un método de reducción de datos", "Un tipo de análisis de datos", "Un algoritmo de clasificación"] },
-  { question: "¿Qué significa 'NLP' en IA?", correct: "Procesamiento del Lenguaje Natural", incorrect: ["Red Neuronal Predictiva", "Programación de Lenguajes", "Análisis de Datos"] },
-  { question: "¿Qué es el 'clustering' en IA?", correct: "Método para agrupar datos similares", incorrect: ["Un tipo de análisis de datos", "Un método de regresión", "Un algoritmo de búsqueda"] },
-  { question: "¿Qué es un 'modelo predictivo' en IA?", correct: "Modelo que hace predicciones basadas en datos históricos", incorrect: ["Modelo que clasifica datos", "Modelo que analiza datos numéricos", "Modelo que agrupa datos similares"] },
-  { question: "¿Qué es una técnica de 'reducción de dimensionalidad'?", correct: "Método para reducir el número de variables en los datos", incorrect: ["Método para aumentar datos", "Una técnica de normalización", "Un tipo de algoritmo de búsqueda"] },
-  { question: "¿Qué es un 'algoritmo genético'?", correct: "Método de optimización inspirado en la evolución natural", incorrect: ["Un tipo de red neuronal", "Un algoritmo de búsqueda en grafos", "Una técnica de compresión"] },
-  { question: "¿Qué es el 'deep learning'?", correct: "Subcampo de IA que usa redes neuronales profundas", incorrect: ["Una técnica de visualización de datos", "Un tipo de algoritmo de búsqueda", "Un método de compresión"] },
-  { question: "¿Qué es la 'regularización' en IA?", correct: "Método para prevenir el sobreajuste del modelo", incorrect: ["Ajuste de hiperparámetros", "Método para mejorar precisión", "Técnica de agrupación de datos"] },
-  { question: "¿Qué es una 'red neuronal convolucional'?", correct: "Red neuronal especializada en procesamiento de imágenes", incorrect: ["Una red para procesamiento de texto", "Un tipo de algoritmo de clasificación", "Una técnica de análisis de datos"] },
-  { question: "¿Qué es la 'inferencia' en IA?", correct: "Proceso de hacer predicciones basadas en un modelo entrenado", incorrect: ["Entrenamiento del modelo", "Recolección de datos", "Visualización de datos"] },
-  { question: "¿Qué es el 'ensemble learning'?", correct: "Método que combina varios modelos para mejorar el rendimiento", incorrect: ["Un tipo de algoritmo de optimización", "Una técnica de reducción de dimensionalidad", "Un tipo de red neuronal"] },
-  { question: "¿Qué es el 'análisis exploratorio de datos' (EDA)?", correct: "Proceso de examinar y resumir datos antes de aplicar modelos", incorrect: ["Entrenamiento de modelos", "Validación de modelos", "Predicción de datos"] },
-  { question: "¿Qué es el 'análisis de sentimientos' en IA?", correct: "Método para identificar emociones en el texto", incorrect: ["Análisis de imágenes", "Análisis de datos numéricos", "Análisis de patrones"] },
-  { question: "¿Qué es el 'entrenamiento transferido' en IA?", correct: "Uso de un modelo preentrenado para una tarea diferente", incorrect: ["Entrenamiento en paralelo", "Entrenamiento con datos adicionales", "Entrenamiento con más etiquetas"] },
-  { question: "¿Qué es una 'técnica de bagging' en IA?", correct: "Método de ensamble que combina modelos entrenados con diferentes subconjuntos de datos", incorrect: ["Técnica de normalización de datos", "Método de reducción de dimensionalidad", "Algoritmo de búsqueda"] },
-  { question: "¿Qué es una 'técnica de reducción de ruido' en IA?", correct: "Método para eliminar datos irrelevantes o ruidosos", incorrect: ["Método para aumentar la cantidad de datos", "Técnica de normalización de datos", "Método de agrupación de datos"] },
-  { question: "¿Qué es una 'regresión lineal' en IA?", correct: "Método para predecir una variable continua a partir de otra", incorrect: ["Método para clasificar datos en categorías", "Modelo para agrupar datos similares", "Técnica para reducir dimensiones"] },
-  { question: "¿Qué es un 'modelo de clasificación' en IA?", correct: "Modelo que asigna etiquetas a datos basados en características", incorrect: ["Modelo que predice valores continuos", "Modelo que agrupa datos similares", "Modelo que realiza análisis descriptivo"] },
-  { question: "¿Qué significa 'AI'?", correct: "Inteligencia Artificial", incorrect: ["Aplicación Interactiva", "Algoritmo Informático", "Análisis Integral"] },
-  { question: "¿Qué es el 'machine learning'?", correct: "Un tipo de IA que permite a las máquinas aprender de datos", incorrect: ["Un software para análisis de datos", "Un hardware especializado en cálculos", "Una técnica de programación"] },
-  { question: "¿Qué es un 'hyperparameter' en IA?", correct: "Parámetro que se establece antes del entrenamiento del modelo", incorrect: ["Parámetro ajustado durante el entrenamiento", "Resultado del modelo", "Valor calculado después del entrenamiento"] },
-  { question: "¿Qué es un 'modelo generativo' en IA?", correct: "Modelo que genera datos similares a los de entrenamiento", incorrect: ["Modelo que solo clasifica datos", "Modelo que realiza análisis descriptivo", "Modelo que realiza predicciones"] },
-  { question: "¿Qué técnica se usa para mejorar la generalización de un modelo?", correct: "Regularización", incorrect: ["Normalización", "Escalado de datos", "Ajuste de hiperparámetros"] },
-  { question: "¿Qué es el 'transfer learning'?", correct: "Uso de conocimientos adquiridos en una tarea para mejorar el rendimiento en otra", incorrect: ["Entrenamiento con datos adicionales", "Modificación de parámetros de un modelo", "Reducción de dimensiones en datos"] },
-  { question: "¿Qué es un 'robot' en el contexto de IA?", correct: "Máquina programada para realizar tareas específicas", incorrect: ["Un software de análisis de datos", "Un tipo de red neuronal", "Un método de visualización de datos"] },
-  { question: "¿Qué es un 'feedback loop' en IA?", correct: "Proceso de retroalimentación para mejorar el rendimiento del modelo", incorrect: ["Un método de clasificación de datos", "Una técnica de agrupación", "Un tipo de red neuronal"] },
-  { question: "¿Qué es el 'diseño de experimentos' en IA?", correct: "Planificación y ejecución de pruebas para evaluar modelos", incorrect: ["Creación de algoritmos", "Implementación de hardware", "Desarrollo de software"] },
-  { question: "¿Qué es el 'método de Monte Carlo' en IA?", correct: "Técnica para realizar simulaciones basadas en la aleatoriedad", incorrect: ["Método para optimizar redes neuronales", "Algoritmo para clasificación de datos", "Técnica para reducción de ruido"] },
-  { question: "¿Qué es el 'análisis de datos' en IA?", correct: "Proceso de examinar datos para obtener información útil", incorrect: ["Entrenamiento de modelos", "Diseño de algoritmos", "Implementación de hardware"] },
-  { question: "¿Qué es una 'función de pérdida' en IA?", correct: "Medida de la discrepancia entre las predicciones del modelo y los valores reales", incorrect: ["Un tipo de red neuronal", "Un algoritmo de clasificación", "Un método de normalización"] },
-  { question: "¿Qué significa 'SVM' en IA?", correct: "Máquinas de Vectores de Soporte", incorrect: ["Sistema de Variables Múltiples", "Simulador de Valores Mínimos", "Sistema de Valor Máximo"] },
-  { question: "¿Qué es una 'red neuronal recurrente' (RNN)?", correct: "Red neuronal especializada en datos secuenciales", incorrect: ["Red neuronal para clasificación de imágenes", "Red neuronal para regresión lineal", "Red neuronal para agrupación de datos"] },
-  { question: "¿Qué es un 'modelo de asociación' en IA?", correct: "Modelo que encuentra relaciones entre variables en un conjunto de datos", incorrect: ["Modelo que realiza predicciones continuas", "Modelo que clasifica datos en categorías", "Modelo que agrupa datos similares"] },
-  { question: "¿Qué es el 'análisis de componentes principales' (PCA)?", correct: "Método para reducir la dimensionalidad de los datos", incorrect: ["Un tipo de red neuronal", "Una técnica de normalización", "Un algoritmo de clasificación"] },
-  { question: "¿Qué es un 'agente autónomo' en IA?", correct: "Sistema que toma decisiones de manera independiente", incorrect: ["Un software para análisis de datos", "Un tipo de red neuronal", "Un método de agrupación"] },
-  { question: "¿Qué es el 'proceso de entrenamiento' en IA?", correct: "Proceso de ajustar un modelo para que haga predicciones precisas", incorrect: ["Desarrollo de hardware", "Implementación de algoritmos", "Análisis de datos"] },
-  { question: "¿Qué es el 'análisis de redes' en IA?", correct: "Estudio de las interacciones entre nodos en una red", incorrect: ["Análisis de datos secuenciales", "Análisis de componentes principales", "Análisis de sentimientos"] }
-];
+        <section class="questions-section" style="display: none">
+          <div id="questionContainer">
+            <!-- Pregunta y opciones se añadirán aquí dinámicamente -->
+          </div>
+          <div id="timer">
+            Tiempo restante: <span id="timeLeft">30</span> segundos
+          </div>
+          <button id="nextQuestion" style="display: none">
+            Siguiente Pregunta
+          </button>
+          <button id="skipQuestion" style="display: none">
+            Saltar Pregunta
+          </button>
+        </section>
 
+        <section class="result-section" style="display: none">
+          <h2>Resultados</h2>
+          <p id="userScore"></p>
+          <div id="topScores">
+            <!-- <h3>Mejores Puntajes</h3> -->
+            <ul id="scoreBoard"></ul>
+          </div>
+          <button id="restartButton">Inicio</button>
+        </section>
+      </main>
+    </div>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const userName = localStorage.getItem("userName") || "Artifixio";
+        document.getElementById("userNameHeader").textContent = `${userName}!`;
 
+        const allQuestions = [
+          {
+            question: "¿Qué es la inteligencia artificial?",
+            correct: "Simulación de inteligencia en máquinas",
+            incorrect: [
+              "Un tipo de programación avanzada",
+              "Un software de procesamiento de texto",
+              "Una técnica de redes sociales",
+            ],
+          },
+          {
+            question:
+              "¿Quién es conocido como el padre de la inteligencia artificial?",
+            correct: "Alan Turing",
+            incorrect: ["Albert Einstein", "Isaac Newton", "Charles Babbage"],
+          },
+          {
+            question:
+              "¿Cuál es el lenguaje de programación más usado en inteligencia artificial?",
+            correct: "Python",
+            incorrect: ["Java", "C#", "JavaScript"],
+          },
+          {
+            question: "¿Qué es un algoritmo?",
+            correct: "Un conjunto de instrucciones para realizar una tarea",
+            incorrect: [
+              "Un tipo de hardware",
+              "Un programa de software",
+              "Un lenguaje de programación",
+            ],
+          },
+          {
+            question: "¿Qué significa IA?",
+            correct: "Inteligencia Artificial",
+            incorrect: [
+              "Interacción Automática",
+              "Instrucción Algorítmica",
+              "Implementación Avanzada",
+            ],
+          },
+          {
+            question: "¿Qué es un chatbot?",
+            correct: "Programa que simula una conversación con un ser humano",
+            incorrect: [
+              "Un tipo de robot físico",
+              "Una aplicación de mensajería",
+              "Un dispositivo de red",
+            ],
+          },
+          {
+            question: "¿Qué es el aprendizaje automático?",
+            correct:
+              "Método de IA que permite a las máquinas aprender de datos",
+            incorrect: [
+              "Un software de gráficos",
+              "Una técnica de almacenamiento",
+              "Un algoritmo de búsqueda",
+            ],
+          },
+          {
+            question: "¿Qué hace un modelo de IA?",
+            correct: "Realiza predicciones o toma decisiones basadas en datos",
+            incorrect: [
+              "Desarrolla software",
+              "Diseña hardware",
+              "Administra redes",
+            ],
+          },
+          {
+            question: "¿Qué es el aprendizaje supervisado?",
+            correct: "Entrenamiento de modelos con datos etiquetados",
+            incorrect: [
+              "Aprendizaje sin datos",
+              "Un tipo de juego en línea",
+              "Entrenamiento en hardware",
+            ],
+          },
+          {
+            question: "¿Qué es el aprendizaje no supervisado?",
+            correct: "Método de aprendizaje sin datos etiquetados",
+            incorrect: [
+              "Entrenamiento con etiquetas",
+              "Uso de datos en línea",
+              "Un método de clasificación",
+            ],
+          },
+          {
+            question: "¿Qué es una red neuronal?",
+            correct: "Modelo computacional inspirado en el cerebro humano",
+            incorrect: [
+              "Un tipo de base de datos",
+              "Un programa de diseño gráfico",
+              "Un tipo de hardware",
+            ],
+          },
+          {
+            question: "¿Qué es el 'overfitting' en IA?",
+            correct:
+              "Cuando un modelo se ajusta demasiado a los datos de entrenamiento",
+            incorrect: [
+              "Cuando un modelo tiene baja precisión",
+              "Cuando un modelo es demasiado simple",
+              "Cuando un modelo no puede aprender",
+            ],
+          },
+          {
+            question: "¿Qué es una técnica de clasificación en IA?",
+            correct: "Método para asignar etiquetas a datos",
+            incorrect: [
+              "Un algoritmo para optimizar datos",
+              "Un tipo de red neuronal",
+              "Un método de reducción de datos",
+            ],
+          },
+          {
+            question: "¿Qué es una 'técnica de regresión'?",
+            correct: "Método para predecir valores continuos",
+            incorrect: [
+              "Método para clasificar datos",
+              "Un tipo de algoritmo de búsqueda",
+              "Una técnica de agrupación",
+            ],
+          },
+          {
+            question: "¿Qué es un 'dataset'?",
+            correct:
+              "Conjunto de datos utilizados para entrenar y probar modelos",
+            incorrect: [
+              "Un tipo de algoritmo",
+              "Un software de análisis",
+              "Una red de datos",
+            ],
+          },
+          {
+            question: "¿Qué es la 'normalización de datos'?",
+            correct: "Proceso de ajustar los datos para que sean consistentes",
+            incorrect: [
+              "Un método de reducción de datos",
+              "Un tipo de análisis de datos",
+              "Un algoritmo de clasificación",
+            ],
+          },
+          {
+            question: "¿Qué significa 'NLP' en IA?",
+            correct: "Procesamiento del Lenguaje Natural",
+            incorrect: [
+              "Red Neuronal Predictiva",
+              "Programación de Lenguajes",
+              "Análisis de Datos",
+            ],
+          },
+          {
+            question: "¿Qué es el 'clustering' en IA?",
+            correct: "Método para agrupar datos similares",
+            incorrect: [
+              "Un tipo de análisis de datos",
+              "Un método de regresión",
+              "Un algoritmo de búsqueda",
+            ],
+          },
+          {
+            question: "¿Qué es un 'modelo predictivo' en IA?",
+            correct: "Modelo que hace predicciones basadas en datos históricos",
+            incorrect: [
+              "Modelo que clasifica datos",
+              "Modelo que analiza datos numéricos",
+              "Modelo que agrupa datos similares",
+            ],
+          },
+          {
+            question: "¿Qué es una técnica de 'reducción de dimensionalidad'?",
+            correct: "Método para reducir el número de variables en los datos",
+            incorrect: [
+              "Método para aumentar datos",
+              "Una técnica de normalización",
+              "Un tipo de algoritmo de búsqueda",
+            ],
+          },
+          {
+            question: "¿Qué es un 'algoritmo genético'?",
+            correct: "Método de optimización inspirado en la evolución natural",
+            incorrect: [
+              "Un tipo de red neuronal",
+              "Un algoritmo de búsqueda en grafos",
+              "Una técnica de compresión",
+            ],
+          },
+          {
+            question: "¿Qué es el 'deep learning'?",
+            correct: "Subcampo de IA que usa redes neuronales profundas",
+            incorrect: [
+              "Una técnica de visualización de datos",
+              "Un tipo de algoritmo de búsqueda",
+              "Un método de compresión",
+            ],
+          },
+          {
+            question: "¿Qué es la 'regularización' en IA?",
+            correct: "Método para prevenir el sobreajuste del modelo",
+            incorrect: [
+              "Ajuste de hiperparámetros",
+              "Método para mejorar precisión",
+              "Técnica de agrupación de datos",
+            ],
+          },
+          {
+            question: "¿Qué es una 'red neuronal convolucional'?",
+            correct: "Red neuronal especializada en procesamiento de imágenes",
+            incorrect: [
+              "Una red para procesamiento de texto",
+              "Un tipo de algoritmo de clasificación",
+              "Una técnica de análisis de datos",
+            ],
+          },
+          {
+            question: "¿Qué es la 'inferencia' en IA?",
+            correct:
+              "Proceso de hacer predicciones basadas en un modelo entrenado",
+            incorrect: [
+              "Entrenamiento del modelo",
+              "Recolección de datos",
+              "Visualización de datos",
+            ],
+          },
+          {
+            question: "¿Qué es el 'ensemble learning'?",
+            correct:
+              "Método que combina varios modelos para mejorar el rendimiento",
+            incorrect: [
+              "Un tipo de algoritmo de optimización",
+              "Una técnica de reducción de dimensionalidad",
+              "Un tipo de red neuronal",
+            ],
+          },
+          {
+            question: "¿Qué es el 'análisis exploratorio de datos' (EDA)?",
+            correct:
+              "Proceso de examinar y resumir datos antes de aplicar modelos",
+            incorrect: [
+              "Entrenamiento de modelos",
+              "Validación de modelos",
+              "Predicción de datos",
+            ],
+          },
+          {
+            question: "¿Qué es el 'análisis de sentimientos' en IA?",
+            correct: "Método para identificar emociones en el texto",
+            incorrect: [
+              "Análisis de imágenes",
+              "Análisis de datos numéricos",
+              "Análisis de patrones",
+            ],
+          },
+          {
+            question: "¿Qué es el 'entrenamiento transferido' en IA?",
+            correct: "Uso de un modelo preentrenado para una tarea diferente",
+            incorrect: [
+              "Entrenamiento en paralelo",
+              "Entrenamiento con datos adicionales",
+              "Entrenamiento con más etiquetas",
+            ],
+          },
+          {
+            question: "¿Qué es una 'técnica de bagging' en IA?",
+            correct:
+              "Método de ensamble que combina modelos entrenados con diferentes subconjuntos de datos",
+            incorrect: [
+              "Técnica de normalización de datos",
+              "Método de reducción de dimensionalidad",
+              "Algoritmo de búsqueda",
+            ],
+          },
+          {
+            question: "¿Qué es una 'técnica de reducción de ruido' en IA?",
+            correct: "Método para eliminar datos irrelevantes o ruidosos",
+            incorrect: [
+              "Método para aumentar la cantidad de datos",
+              "Técnica de normalización de datos",
+              "Método de agrupación de datos",
+            ],
+          },
+          {
+            question: "¿Qué es una 'regresión lineal' en IA?",
+            correct:
+              "Método para predecir una variable continua a partir de otra",
+            incorrect: [
+              "Método para clasificar datos en categorías",
+              "Modelo para agrupar datos similares",
+              "Técnica para reducir dimensiones",
+            ],
+          },
+          {
+            question: "¿Qué es un 'modelo de clasificación' en IA?",
+            correct:
+              "Modelo que asigna etiquetas a datos basados en características",
+            incorrect: [
+              "Modelo que predice valores continuos",
+              "Modelo que agrupa datos similares",
+              "Modelo que realiza análisis descriptivo",
+            ],
+          },
+          {
+            question: "¿Qué significa 'AI'?",
+            correct: "Inteligencia Artificial",
+            incorrect: [
+              "Aplicación Interactiva",
+              "Algoritmo Informático",
+              "Análisis Integral",
+            ],
+          },
+          {
+            question: "¿Qué es el 'machine learning'?",
+            correct:
+              "Un tipo de IA que permite a las máquinas aprender de datos",
+            incorrect: [
+              "Un software para análisis de datos",
+              "Un hardware especializado en cálculos",
+              "Una técnica de programación",
+            ],
+          },
+          {
+            question: "¿Qué es un 'hyperparameter' en IA?",
+            correct:
+              "Parámetro que se establece antes del entrenamiento del modelo",
+            incorrect: [
+              "Parámetro ajustado durante el entrenamiento",
+              "Resultado del modelo",
+              "Valor calculado después del entrenamiento",
+            ],
+          },
+          {
+            question: "¿Qué es un 'modelo generativo' en IA?",
+            correct: "Modelo que genera datos similares a los de entrenamiento",
+            incorrect: [
+              "Modelo que solo clasifica datos",
+              "Modelo que realiza análisis descriptivo",
+              "Modelo que realiza predicciones",
+            ],
+          },
+          {
+            question:
+              "¿Qué técnica se usa para mejorar la generalización de un modelo?",
+            correct: "Regularización",
+            incorrect: [
+              "Normalización",
+              "Escalado de datos",
+              "Ajuste de hiperparámetros",
+            ],
+          },
+          {
+            question: "¿Qué es el 'transfer learning'?",
+            correct:
+              "Uso de conocimientos adquiridos en una tarea para mejorar el rendimiento en otra",
+            incorrect: [
+              "Entrenamiento con datos adicionales",
+              "Modificación de parámetros de un modelo",
+              "Reducción de dimensiones en datos",
+            ],
+          },
+          {
+            question: "¿Qué es un 'robot' en el contexto de IA?",
+            correct: "Máquina programada para realizar tareas específicas",
+            incorrect: [
+              "Un software de análisis de datos",
+              "Un tipo de red neuronal",
+              "Un método de visualización de datos",
+            ],
+          },
+          {
+            question: "¿Qué es un 'feedback loop' en IA?",
+            correct:
+              "Proceso de retroalimentación para mejorar el rendimiento del modelo",
+            incorrect: [
+              "Un método de clasificación de datos",
+              "Una técnica de agrupación",
+              "Un tipo de red neuronal",
+            ],
+          },
+          {
+            question: "¿Qué es el 'diseño de experimentos' en IA?",
+            correct:
+              "Planificación y ejecución de pruebas para evaluar modelos",
+            incorrect: [
+              "Creación de algoritmos",
+              "Implementación de hardware",
+              "Desarrollo de software",
+            ],
+          },
+          {
+            question: "¿Qué es el 'método de Monte Carlo' en IA?",
+            correct:
+              "Técnica para realizar simulaciones basadas en la aleatoriedad",
+            incorrect: [
+              "Método para optimizar redes neuronales",
+              "Algoritmo para clasificación de datos",
+              "Técnica para reducción de ruido",
+            ],
+          },
+          {
+            question: "¿Qué es el 'análisis de datos' en IA?",
+            correct: "Proceso de examinar datos para obtener información útil",
+            incorrect: [
+              "Entrenamiento de modelos",
+              "Diseño de algoritmos",
+              "Implementación de hardware",
+            ],
+          },
+          {
+            question: "¿Qué es una 'función de pérdida' en IA?",
+            correct:
+              "Medida de la discrepancia entre las predicciones del modelo y los valores reales",
+            incorrect: [
+              "Un tipo de red neuronal",
+              "Un algoritmo de clasificación",
+              "Un método de normalización",
+            ],
+          },
+          {
+            question: "¿Qué significa 'SVM' en IA?",
+            correct: "Máquinas de Vectores de Soporte",
+            incorrect: [
+              "Sistema de Variables Múltiples",
+              "Simulador de Valores Mínimos",
+              "Sistema de Valor Máximo",
+            ],
+          },
+          {
+            question: "¿Qué es una 'red neuronal recurrente' (RNN)?",
+            correct: "Red neuronal especializada en datos secuenciales",
+            incorrect: [
+              "Red neuronal para clasificación de imágenes",
+              "Red neuronal para regresión lineal",
+              "Red neuronal para agrupación de datos",
+            ],
+          },
+          {
+            question: "¿Qué es un 'modelo de asociación' en IA?",
+            correct:
+              "Modelo que encuentra relaciones entre variables en un conjunto de datos",
+            incorrect: [
+              "Modelo que realiza predicciones continuas",
+              "Modelo que clasifica datos en categorías",
+              "Modelo que agrupa datos similares",
+            ],
+          },
+          {
+            question: "¿Qué es el 'análisis de componentes principales' (PCA)?",
+            correct: "Método para reducir la dimensionalidad de los datos",
+            incorrect: [
+              "Un tipo de red neuronal",
+              "Una técnica de normalización",
+              "Un algoritmo de clasificación",
+            ],
+          },
+          {
+            question: "¿Qué es un 'agente autónomo' en IA?",
+            correct: "Sistema que toma decisiones de manera independiente",
+            incorrect: [
+              "Un software para análisis de datos",
+              "Un tipo de red neuronal",
+              "Un método de agrupación",
+            ],
+          },
+          {
+            question: "¿Qué es el 'proceso de entrenamiento' en IA?",
+            correct:
+              "Proceso de ajustar un modelo para que haga predicciones precisas",
+            incorrect: [
+              "Desarrollo de hardware",
+              "Implementación de algoritmos",
+              "Análisis de datos",
+            ],
+          },
+          {
+            question: "¿Qué es el 'análisis de redes' en IA?",
+            correct: "Estudio de las interacciones entre nodos en una red",
+            incorrect: [
+              "Análisis de datos secuenciales",
+              "Análisis de componentes principales",
+              "Análisis de sentimientos",
+            ],
+          },
+        ];
 
+        function getRandomQuestions(questions, num = 10) {
+          const shuffled = [...questions].sort(() => 0.5 - Math.random());
+          return shuffled.slice(0, num);
+        }
 
-      function getRandomQuestions(questions, num = 10) {
-        const shuffled = [...questions].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, num);
-      }
+        const selectedQuestions = getRandomQuestions(allQuestions);
 
-      const selectedQuestions = getRandomQuestions(allQuestions);
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timer;
+        let timeLeft = 30;
 
-      let currentQuestionIndex = 0;
-      let score = 0;
-      let timer;
-      let timeLeft = 30;
-
-      document.getElementById('beginTestButton').addEventListener('click', () => {
-        document.querySelector('.start-section').style.display = 'none';
-        document.querySelector('.questions-section').style.display = 'block';
-        showQuestion();
-      });
-
-      function showQuestion() {
-        const questionContainer = document.getElementById('questionContainer');
-        questionContainer.innerHTML = '';
-
-        if (currentQuestionIndex < selectedQuestions.length) {
-          const questionData = selectedQuestions[currentQuestionIndex];
-          const correctAnswer = questionData.correct;
-          const incorrectAnswers = questionData.incorrect;
-          const options = shuffleArray([correctAnswer, ...incorrectAnswers]);
-
-          const questionTitle = document.createElement('h2');
-          questionTitle.textContent = `Pregunta ${currentQuestionIndex + 1}: ${questionData.question}`;
-          questionContainer.appendChild(questionTitle);
-
-          options.forEach(option => {
-            const button = document.createElement('button');
-            button.textContent = option;
-            button.className = 'option';
-            button.addEventListener('click', () => handleAnswer(option, correctAnswer));
-            questionContainer.appendChild(button);
+        document
+          .getElementById("beginTestButton")
+          .addEventListener("click", () => {
+            document.querySelector(".start-section").style.display = "none";
+            document.querySelector(".questions-section").style.display =
+              "block";
+            showQuestion();
           });
 
-          document.getElementById('nextQuestion').style.display = 'block';
-          document.getElementById('skipQuestion').style.display = 'block';
-          startTimer();
-        } else {
-          endTest();
-        }
-      }
+        function showQuestion() {
+          const questionContainer =
+            document.getElementById("questionContainer");
+          questionContainer.innerHTML = "";
 
-      function handleAnswer(selectedAnswer, correctAnswer) {
-        clearInterval(timer);
-        if (selectedAnswer === correctAnswer) {
-          score++;
-        }
-        currentQuestionIndex++;
-        showQuestion();
-      }
+          if (currentQuestionIndex < selectedQuestions.length) {
+            const questionData = selectedQuestions[currentQuestionIndex];
+            const correctAnswer = questionData.correct;
+            const incorrectAnswers = questionData.incorrect;
+            const options = shuffleArray([correctAnswer, ...incorrectAnswers]);
 
-      function startTimer() {
-        timeLeft = 30;
-        document.getElementById('timeLeft').textContent = timeLeft;
-        timer = setInterval(() => {
-          timeLeft--;
-          document.getElementById('timeLeft').textContent = timeLeft;
-          if (timeLeft === 0) {
-            clearInterval(timer);
-            handleAnswer(null, selectedQuestions[currentQuestionIndex].correct);
+            const questionTitle = document.createElement("h2");
+            questionTitle.textContent = `Pregunta ${
+              currentQuestionIndex + 1
+            }: ${questionData.question}`;
+            questionContainer.appendChild(questionTitle);
+
+            options.forEach((option) => {
+              const button = document.createElement("button");
+              button.textContent = option;
+              button.className = "option";
+              button.addEventListener("click", () =>
+                handleAnswer(option, correctAnswer)
+              );
+              questionContainer.appendChild(button);
+            });
+
+            document.getElementById("nextQuestion").style.display = "block";
+            document.getElementById("skipQuestion").style.display = "block";
+            startTimer();
+          } else {
+            endTest();
           }
-        }, 1000);
-      }
+        }
 
-      let dataSent = false; // Bandera para controlar si los datos ya se enviaron
+        function handleAnswer(selectedAnswer, correctAnswer) {
+          clearInterval(timer);
+          if (selectedAnswer === correctAnswer) {
+            score++;
+          }
+          currentQuestionIndex++;
+          showQuestion();
+        }
 
-function endTest() {
-    if (dataSent) return; // Si los datos ya se enviaron, salir de la función
+        function startTimer() {
+          timeLeft = 30;
+          document.getElementById("timeLeft").textContent = timeLeft;
+          timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById("timeLeft").textContent = timeLeft;
+            if (timeLeft === 0) {
+              clearInterval(timer);
+              handleAnswer(
+                null,
+                selectedQuestions[currentQuestionIndex].correct
+              );
+            }
+          }, 1000);
+        }
 
-    dataSent = true; // Marcar que los datos han sido enviados
+        let dataSent = false; // Bandera para controlar si los datos ya se enviaron
 
-    document.querySelector('.questions-section').style.display = 'none';
-    document.querySelector('.result-section').style.display = 'block';
+        function endTest() {
+          if (dataSent) return; // Si los datos ya se enviaron, salir de la función
 
-    // Mostrar el puntaje del usuario
-    document.getElementById('userScore').textContent = `¡Felicidades, ${userName}! Tu puntaje es: ${score}`;
+          dataSent = true; // Marcar que los datos han sido enviados
 
-    // Preparar los datos del usuario
-    const userData = { name: userName, points: score };
+          document.querySelector(".questions-section").style.display = "none";
+          document.querySelector(".result-section").style.display = "block";
 
-    // Enviar los datos al backend
-    fetch('https://test-ia-sadp.vercel.app/saveUserData', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Datos guardados:', data);
-    })
-    .catch(error => {
-      console.error('Error al guardar los datos:', error);
-    });
-}
+          // Mostrar el puntaje del usuario
+          document.getElementById(
+            "userScore"
+          ).textContent = `¡Felicidades, ${userName}! Tu puntaje es: ${score}`;
 
+          // Preparar los datos del usuario
+          const userData = { name: userName, points: score };
 
-function showTopScores() {
-    fetch('https://test-ia-sadp.vercel.app/getTopScores')
-        .then(response => response.json())
-        .then(data => {
-            const scoreBoard = document.getElementById('scoreBoard');
-            scoreBoard.innerHTML = '';
-            data.sort((a, b) => b.points - a.points);
-            data.slice(0, 5).forEach(participante => {
-                const li = document.createElement('li');
+          // Enviar los datos al backend
+          fetch("https://test-ia-sadp.vercel.app/saveUserData", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Datos guardados:", data);
+              showTopScores(); // Actualiza la lista de los mejores puntajes
+            })
+            .catch((error) => {
+              console.error("Error al guardar los datos:", error);
+            });
+        }
+
+        function showTopScores() {
+          fetch("/getTopScores")
+            .then((response) => response.json())
+            .then((data) => {
+              const scoreBoard = document.getElementById("scoreBoard");
+              scoreBoard.innerHTML = "";
+              data.sort((a, b) => b.points - a.points);
+              data.slice(0, 5).forEach((participante) => {
+                const li = document.createElement("li");
                 li.textContent = `${participante.name}: ${participante.points} puntos`;
                 scoreBoard.appendChild(li);
+              });
             });
-            // Enviar datos al backend para guardarlos en la base de datos
-            sendTopScoresToBackend(data);
-        });
-}
-
-function sendTopScoresToBackend(scores) {
-    fetch('/saveTopScores', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ scores }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Puntajes guardados correctamente');
-        } else {
-            console.error('Error guardando los puntajes');
         }
-    })
-    .catch(error => {
-        console.error('Error en la solicitud POST:', error);
-    });
-}
 
-      function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
+        function shuffleArray(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+          return array;
         }
-        return array;
-      }
 
-      document.getElementById('nextQuestion').addEventListener('click', () => {
-        currentQuestionIndex++;
-        showQuestion();
-      });
+        document
+          .getElementById("nextQuestion")
+          .addEventListener("click", () => {
+            currentQuestionIndex++;
+            showQuestion();
+          });
 
-      document.getElementById('skipQuestion').addEventListener('click', () => {
-        currentQuestionIndex++;
-        showQuestion();
-      });
+        document
+          .getElementById("skipQuestion")
+          .addEventListener("click", () => {
+            currentQuestionIndex++;
+            showQuestion();
+          });
 
-      document.getElementById('restartButton').addEventListener('click', () => {
-        window.location.href = 'index.html';
+        document
+          .getElementById("restartButton")
+          .addEventListener("click", () => {
+            window.location.href = "index.html";
+          });
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
-
-
-    
