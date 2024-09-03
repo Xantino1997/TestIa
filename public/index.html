@@ -93,37 +93,37 @@
             });
         });
 
-        // Obtener y mostrar los mejores puntajes
-        fetch("https://test-ia-sadp.vercel.app/getTopScores")
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.length === 0) return; // Si no hay datos, no hacemos nada
+       // Obtener y mostrar los mejores puntajes
+  fetch("https://test-ia-sadp.vercel.app/getTopScores")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.length === 0) return; // Si no hay datos, no hacemos nada
 
-            // Ordenar los datos por puntaje en orden descendente
-            const sortedData = data.sort((a, b) => b.points - a.points);
+      // Ordenar los datos por puntaje en orden descendente
+      // Nota: No es necesario ordenar aquí ya que ya está ordenado en el backend
 
-            // Seleccionar los tres primeros elementos
-            const topThree = sortedData.slice(0, 3);
-            const cups = ["🏆", "🥉", "🥈"]; // íconos para cada puesto
+      // Seleccionar los tres primeros elementos
+      const topThree = data; // Los datos ya están limitados a 3 en el backend
+      const cups = ["🏆", "🥉", "🥈"]; // íconos para cada puesto
 
-            // Limpiar el contenedor de los puntajes antes de agregar nuevos
-            topScoresList.innerHTML = "";
+      // Limpiar el contenedor de los puntajes antes de agregar nuevos
+      topScoresList.innerHTML = "";
 
-            // Mostrar los tres mejores puntajes
-            topThree.forEach((user, index) => {
-              const scoreItem = document.createElement("div");
-              scoreItem.className = "top-score-item";
+      // Mostrar los tres mejores puntajes
+      topThree.forEach((user, index) => {
+        const scoreItem = document.createElement("div");
+        scoreItem.className = "top-score-item";
 
-              const icon = cups[index] || "";
+        const icon = cups[index] || "";
 
-              scoreItem.innerHTML = `${icon} ${user.name}: ${user.points}`;
-              topScoresList.appendChild(scoreItem);
-            });
-          })
-          .catch((error) => {
-            console.error("Error obteniendo los mejores puntajes:", error);
-          });
+        scoreItem.innerHTML = `${icon} ${user.name}: ${user.points}`;
+        topScoresList.appendChild(scoreItem);
       });
+    })
+    .catch((error) => {
+      console.error("Error obteniendo los mejores puntajes:", error);
+    });
+});
     </script>
   </body>
 </html>

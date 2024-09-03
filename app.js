@@ -74,11 +74,9 @@ app.post('/saveUserData', async (req, res) => {
     }
   });
   
-  // Ruta para obtener los mejores puntajes
   app.get('/getTopScores', async (req, res) => {
     try {
       const participantes = await Participante.find().sort({ points: -1 }).limit(3);
-  
       res.json(participantes);
     } catch (error) {
       console.error('Error obteniendo los mejores puntajes:', error);
