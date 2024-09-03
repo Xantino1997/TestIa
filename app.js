@@ -10,6 +10,7 @@ const { MongoClient } = require('mongodb');
 const uri = 'mongodb+srv://devprueba2022:newdev2024@cluster0.9x8yltr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Reemplaza con tu cadena de conexión de MongoDB
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+const Participante = require('./schemaParticipantes');
 
 
 // Configurar middleware
@@ -47,57 +48,43 @@ app.post('/saveLead', async (req, res) => {
   }
 });
 
+ // Ruta para guardar los datos de usuario en la base de datos
+app.post('/saveUserData', async (req, res) => {
+    const userData = req.body;
   
-// Ruta para obtener los mejores puntajes
-app.get('/getTopScores', (req, res) => {
-  const userDataFilePath = path.join(__dirname, 'userData.json'); // Ruta al archivo con los puntajes de usuario
-
-  // Leer los datos del archivo userData.json
-  fs.readFile(userDataFilePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error leyendo datos:', err);
-      return res.status(500).send('Error leyendo datos');
-    }
-
-    let userData = [];
-
     try {
-      userData = JSON.parse(data);
-    } catch (parseError) {
-      console.error('Error parseando datos:', parseError);
-      return res.status(500).send('Error parseando datos');
+      // Crear un nuevo participante con los datos del usuario
+      const participante = new Participante({
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        points: userData.points
+      });
+  
+      // Guardar el participante en la base de datos
+      await participante.save();
+  
+      // Obtener los mejores puntajes
+      const topScores = await Participante.find().sort({ points: -1 }).limit(3);
+  
+      res.json({ message: 'Datos guardados', topScores });
+    } catch (error) {
+      console.error('Error guardando datos de usuario:', error);
+      res.status(500).json({ success: false, message: 'Error guardando datos de usuario' });
     }
-
-    // Ordenar los datos por puntaje descendente (asumiendo que hay un campo 'score')
-    userData.sort((a, b) => b.score - a.score);
-
-    // Seleccionar los tres primeros resultados
-    const topScores = userData.slice(0, 3);
-
-    res.json(topScores);
   });
-});
-
-// Ruta para guardar los datos de usuario
-app.post('/saveUserData', (req, res) => {
-  const userData = req.body;
-  const userDataFilePath = path.join(__dirname, 'userData.json'); // Ruta al archivo con los puntajes de usuario
-
-  fs.readFile(userDataFilePath, 'utf8', (err, data) => {
-    if (err) return res.status(500).send('Error leyendo datos de usuario');
-
-    let users = [];
-    if (data) {
-      users = JSON.parse(data);
+  
+  // Ruta para obtener los mejores puntajes
+  app.get('/getTopScores', async (req, res) => {
+    try {
+      const participantes = await Participante.find().sort({ points: -1 }).limit(3);
+  
+      res.json(participantes);
+    } catch (error) {
+      console.error('Error obteniendo los mejores puntajes:', error);
+      res.status(500).json({ success: false, message: 'Error obteniendo los mejores puntajes' });
     }
-
-    users.push(userData);
-    users.sort((a, b) => b.points - a.points);
-    fs.writeFile(userDataFilePath, JSON.stringify(users, null, 2), 'utf8', (err) => {
-      if (err) return res.status(500).send('Error guardando datos de usuario');
-      res.json({ message: 'Datos guardados' });
-    });
   });
-});
+  
 
 module.exports = app;
