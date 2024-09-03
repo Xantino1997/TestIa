@@ -21,28 +21,33 @@ app.get('/status', (req, res) => {
   res.send('Servidor en marcha');
 });
 
-// Ruta para guardar los datos en leads.json
 app.post('/saveLead', (req, res) => {
-  const { name, email, phone } = req.body;
-
-  // Leer el archivo leads.json si existe, de lo contrario crea un array vacío
-  const filePath = path.join(__dirname, 'leads.json');
-  let leads = [];
-
-  if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath);
-    leads = JSON.parse(data);
-  }
-
-  // Agregar el nuevo lead al array
-  leads.push({ name, email, phone });
-
-  // Guardar los datos actualizados en leads.json
-  fs.writeFileSync(filePath, JSON.stringify(leads, null, 2));
-
-  res.json({ success: true });
-});
-
+    try {
+      const { name, email, phone } = req.body;
+  
+      if (!name || !email || !phone) {
+        return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
+      }
+  
+      const filePath = path.join(__dirname, 'leads.json');
+      let leads = [];
+  
+      if (fs.existsSync(filePath)) {
+        const data = fs.readFileSync(filePath);
+        leads = JSON.parse(data);
+      }
+  
+      leads.push({ name, email, phone });
+  
+      fs.writeFileSync(filePath, JSON.stringify(leads, null, 2));
+  
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error guardando datos:', error);
+      res.status(500).json({ success: false, message: 'Hubo un problema al guardar los datos' });
+    }
+  });
+  
 // Ruta para obtener los mejores puntajes
 app.get('/getTopScores', (req, res) => {
   const userDataFilePath = path.join(__dirname, 'userData.json'); // Ruta al archivo con los puntajes de usuario
