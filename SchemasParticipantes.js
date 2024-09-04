@@ -13,6 +13,6 @@ const participanteSchema = new mongoose.Schema({
   timestamps: true // Agrega createdAt y updatedAt automáticamente
 });
 
-const Participante = mongoose.model('Participante', participanteSchema);
+const Participante = mongoose.model('Participantes', participanteSchema);
 
 module.exports = Participante;
