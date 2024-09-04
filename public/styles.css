@@ -102,7 +102,7 @@ button:hover {
   }
   .image-empatia {
     height: auto;
-    width: 60%; /* Ajuste el tamaño de la imagen para que no ocupe todo el contenedor */
+    width: 100%; /* Ajuste el tamaño de la imagen para que no ocupe todo el contenedor */
     z-index: 1; /* Asegura que la imagen esté en el frente */
     mix-blend-mode: multiply; /* Mezcla la imagen con el degradado */
   }
